@@ -1,1 +1,2 @@
 this is a license.
+jut to test if 'git push' equal to 'git push origin master' after i use 'git push -u origin master' .

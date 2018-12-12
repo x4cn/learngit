@@ -1,1 +1,2 @@
 rebase: init here
+set exit = 1

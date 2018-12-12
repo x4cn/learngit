@@ -1,0 +1,473 @@
+
+1.安装git
+设置默认打开文件的编辑器:可以通过选择目录的方式.
+
+设置用户名和邮箱
+git config --global user.name "Your Name"
+git config --global user.email "email@example.com"
+
+注意git config命令的--global参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库指定不同的用户名和Email地址。
+
+你可能会看到重复的变量名，因为 Git 会从不同的文件中读取同一个配置（例如：/etc/gitconfig 与 ~/.gitconfig）。 这种情况下，Git 会使用它找到的每一个变量的最后一个配置。
+
+可以在某个仓库中使用 git config user.name 'newname' 配置新的名字,只在这个仓库生效.
+也可以在某个仓库中使用 git config user.name 查看在这个仓库中生效的名字(global name可能被覆盖).
+如果你在仓库之外使用 git config user.name 看到就是global name
+
+
+
+2.创建版本库
+	
+	第一:创建目录,进入目录,
+	mkdir learngit
+	cd learngit
+	pwd
+	
+	第二:在那个目录中init, 此时已经在 learngit目录中了.
+	git init
+	出现的提示信息:Initialized empty Git repository in C:/Users/cheng/learngit/.git/
+
+
+3. 把文件条件到仓库
+
+   将文件从工作区添加到暂存区
+   git add 文件
+   将文件从暂存区添加到本地仓库
+   git commit -m "描述信息"
+
+   注意:commit可以当做是一个快照,一个版本
+	git 可以一次add多个文件,中间使用空格隔开 : git add test.txt a.txt b.txt
+
+
+   ------------------------------------------------------
+   一个空的仓库初始化之后, 建立一个文件test.txt,写入一些内容. 没有add ,直接 commit.
+   结果:显示 initial commit, untracked files:test.txt, nothing added to cmmmit but untracked files present.
+        输入命令: git log.  显示: Fatal: your current branch 'master' does not have any commits yet.
+	可见没有commit. 必须要先add到暂存区, 然后才可以commit.
+
+   接着上面的.将test.txt使用git add命令. 同时再次修改test.txt, 修改后的文件没有git add.
+   此时使用:git status. 出现:changes to be commit: new file: test.txt ; changes not staged for commit, modified: test.txt
+   此时commit, 然后 使用 git status. 出现: changes not staged for commit, modefied: test.txt.
+   可见commit只是第一次写入的内容. 第二次进行修改的内容,因为没有add, 所以没有被提交上去.
+
+   所以: 可见一个内容只有被add后,才可以被commit.
+    一个文件,修改一次,add; 修改第二次; commit, 此时commit的只是第一次修改的内容.
+
+   ---------------------------------------------------------
+   commit后,暂存区还是有内容的,此时暂存区同commit仓库内容一致,使用git diff --cached,没有输出.暂存区不是被清空了.
+ 
+   -----------------------------------------------------------
+   git commit 之后出现格式: [分支名 commit提交的版本号] commit的描述
+   
+co
+
+3. git status
+
+ 出现:untracked files: 表示工作区中有文件,没有被提交到暂存区;
+ 出现:changes not staged for commit : 表明工作区有文件修改了,这文件还没有被提交(可以先提交到暂存,再)	
+
+ 出现:changes to be committed: 表示暂存区中有文件,没有被commit到本地仓库.
+
+ 出现:nothing to commit ,working tree clean : 表示没有需要提交的修改,工作区是干净的.
+
+
+4. git diff
+   查看--a (暂存区的文件版本) 同 ++b(工作区的文件版本)之间的差异.
+
+   git diff --cached
+   查看 --a(仓库已经提交的commit) 同 ++b (暂存区)之间的差异
+
+
+5. 版本回退.
+
+
+	----------------
+	git log
+	git reset --hard commit_id
+	git reflog
+
+	----------------
+
+	第一:查看commit的历史记录,已经当前在那个commit版本上.
+	可能commit了很多次,可以通过git log 命令查看commit的历史记录: 从最近到最远的commit日志.
+	git log
+
+	如果觉得不好看,可以让其一行显示
+	git log --pretty=oneline
+	
+	也可以使用
+	git log --oneline
+	这个显示的commit的文件名的hash编码只显示7位.
+
+	git log 记录很多可以通过上下按钮切换,也可以输入数字翻页; 输入q,退出git log 命令.
+
+	------------------------
+	Git中用 HEAD 表示当前版本 , 前一个版本 HEAD^ , 前两个版本 HEAD^^ , 前一百个版本 HEAD~100
+	也可以使用 HEAD~1 表示前一个版本,  HEAD~2 表示前两个版本.
+	
+	回退到上一个版本:运行下面的命令后,所以的文件内容都变成了上一次提交后的版本
+	git reset --hard HEAD^
+	此时,使用 git log   (显示出来的commit日志历史记录就减少了一条,比如原本有3条记录,现在只有两条了)
+
+	-----------------------
+	如何回到最近的那条?要知道commit的版本号,但是在git log 中只显示两条,找不到最近的那个commit的版本号.
+	
+	下面的命令可以看到所有的commit历史和一些操作的历史.可以通过这个知道commit的版本的hash值.
+	git reflog
+
+	然后执行
+	git reset --hard commit_id
+	例如
+	git reset --hard 2e457de
+
+	----------
+        注意如果使用 git reset --hard HEAD~100  ,但是当前只用3个版本(最多只能HEAD~2),这个就好报错.
+        同时注意使用 git rellog 查看可以发现 这个错误的reset操作并不在 git rellog 的记录中.
+
+
+6. 撤销更改.
+
+	---------------------------------
+	撤销工作区修改:
+	git checkout -- readme.txt
+	撤销暂存区修改:
+	git reset HEAD readme.txt
+
+	-------------------------------
+
+
+	第一:撤销[工作区]的某个文件的修改.
+    	撤销更改某个文件. git checkout 后边必须是 -- 空格 具体的文件名; 这样才能执行对某个文件进行撤销修改.
+	撤销更改工作区的文件.
+	git checkout -- readme.txt
+
+	--------------------------
+	命令git checkout -- readme.txt意思就是，把readme.txt文件在工作区的修改全部撤销，这里有两种情况：
+
+	一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+
+	一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+
+	总之，就是让这个文件回到最近一次git commit或git add时的状态。
+
+	----------------------------------
+
+	git reset HEAD readme.txt
+	撤销[暂存区]的某个文件的修改,使其版本同最新的commit一致.
+
+	---------------------------------------
+	问题:一个文件的工作区版本,暂存区版本,commit区版本均为1.
+        文件第一次修改,工作区版本变为2; add添加到暂存区, 暂存区版本为2; commit区版本仍然是1.
+	文件第二修改,工作区版本为3; 暂存区版本为2; commit区版本为1.
+	如何让工作区的版本变为1.
+	如何我们使用git checkout -- read.txt. 会检索暂存区和commit区,发现最新的提交的版本是2,此时工作区的版本只会回复到版本2.
+	
+	所以,我们应该先降低暂存区的版本.
+	使用git reset HEAD read.txt . 撤销暂存区的修改,将暂存区的版本恢复到最新的commit, 就是版本1.
+	然后再用git checkout -- read.txt 撤销工作区的修改.
+	
+	--------------------------------------
+
+
+7. 删除文件
+	git rm readme.txt
+	这个命令是删除工作区文件(rm readme.txt) 和 删除暂存区(索引区)文件(git add readme.txt) 这个两个操作的集合.
+
+
+8. 远程版本库
+	1.创建 SSH key
+	在 git bash 中输入
+	ssh-keygen -t rsa -C "youremail@example.com"
+
+	查看ssh key: id_rsa 私钥. id_rsa.pub 公钥.
+	cd ~
+	cd .ssh
+ 	ls
+
+	2.登陆github
+	setting ----> SSH and GPG keys ---> new SSH key ----->添加title 和 key 即可
+
+
+9. 添加到远程库(将本地已经存在的库添加到远程的空白库)
+	第一:登陆远程库,创建一个仓库learngit
+
+	第二: 给远程的仓库地址取一个别名
+	在本地的learngit仓库下运行命令:
+	git remote add origin git@github.com:michaelliao/learngit.git
+
+
+	-------------------------
+	可以另外添加其他的远程库起名字为origin2,origin3,或者其他的名字,你可以自己设定.
+	git remote -v        这个命令可以查看所有的设置的remote.
+	git reomte rm origin  这个命令可以删除 被命名为 origin的 remote.
+	git remote set-url origin git@github.com:nazar-art/NewYearGift.git  这个命令可以为origin这个命名设置其他的远程仓库地址.
+	git remote show origin		查看缩写为origin的这个远程仓库的详细信息.
+	git remote rename origin neworigin	将缩写为origin的这个远程地址的缩写改为neworigin.
+	------------------
+	注意:每个仓库都可以有名为origin的缩写的远程仓库.比如learngit这个本地库有两个远程缩写地址:origin,test;
+		gittest这个本地库有三个远程缩写地址:origin,origin2,remotetest. 这两个不同本地库中中origin对应
+		的地址可以相同也可以不相同.
+	------------------------
+
+
+	第三: 将本地仓库的内容推动到远程仓库
+	git push -u origin master
+	使用 -u 这个参数,以后就可以直接使用 git push (这个命令就代表这个 git push origin maste 的简化.)
+
+
+
+10. 从远程库克隆(远程创建一个库,将其克隆到本地)
+	第一步:登陆远程库,创建一个gitskills的库,勾选initialize this repository with a README.
+
+	第二步: git clone git@github.com:michaelliao/gitskills.git
+	然后
+	cd gitskills
+	ls
+
+	---------------
+	注意:当你使用 git clone 后, 本地仓库自动创建了一个远程仓库的缩写origin.
+	     所以你可以直接使用git push  这个命令等同于 git push origin master 
+
+	-------------------
+	也可以使用 https 的方式克隆:
+	https://github.com/michaelliao/gitskills.git
+	这种方式的克隆首先 肯定会自动创建origin的缩写,所以可以使用git push 提交到远程仓库;
+	但是,每次git push 的时候要求你输入那个远程仓库的用户名和密码;
+	有两种方法解决:
+	第一种:重新设置 origin的地址改为SSH的方式.
+	第二种:使用git config --list 查看 credential.helper=manager , 如果是manager的话,你只需要输入一次就可以了.		
+	
+	-------------------------------------
+	产生SSH key 的邮箱账号, git config 中的邮箱账号, github的邮箱账号 三者之间的关系?
+	三者没有任何关系, 比如 产生SSH key 的 邮箱是 aa@qq.com ;
+	git cnfig 中 global的账号是 bb@qq.com ,假设用户名是bb; github的邮箱账号是 cc@qq.com;
+	你将aa@qq.com 产生的 SSH key 放在 cc@qq.com 登陆的 github 账号中,
+	你提交代码到github 中,此时显示的提交者是 bb; 如何你给仓库修改本仓库的账号dd@qq.com ,用户名dd ;
+	此时继续提交到cc@qq.com的GitHub中, 显示的提交者就是dd.
+
+	------------------------------
+
+
+
+11. 创建与合并分支
+
+	查看分支：git branch
+
+	创建分支：git branch <name>
+
+	切换分支：git checkout <name>
+
+	创建+切换分支：git checkout -b <name>
+
+	合并某分支到当前分支：git merge <name>
+
+	删除分支：git branch -d <name>
+
+	--------------------------------------
+
+	第一:创建div分支,并切换到dev分支.
+	git checkout -b dev   
+	git checkout -b 表示创建并切换,相当于两条命令.
+	git branch dev
+	git checkout dev
+
+	第二:查看分支: 列出所有分支,当前分支前面有*
+	git branch
+
+	第三:切换分支.
+	git checkout 分支名
+	注意:你在dev 分支做的提交在master分支是看不到的,除非进行merge.
+	     你进行合并和 后,才可以在master分支看到dev分支的commit.
+
+	第四:合并分支.  (当前分支合并被合并的分支)
+	git merge 被合并的分支名
+
+	---------------
+	git merge 如果出现 fast-forward 表示这次合并是 快进模式,也就是直接把master指向dev的当前提交，所以合并速度非常快
+	注意:对于 fast-forward . 如果master分支的commit是3, 此时创建分支dev, dev分支commit,此时 commit 是4;
+		切换到maser, master合并dev, 此时maser分支也是执行commit 4 ; 此时在master分支, 连续commit两次, 变成了 commit 6.
+		此时如果切换到dev. 此时dev 指向的commit是 4.
+	
+	第五:删除分支
+	git branch -d dev 
+
+
+
+12. 解决冲突
+
+	有时候使用git merge可能会出现冲突,提示我们那个文件冲突. 可以通过git status 查看具体冲突的信息.
+	因此我们需要手动打开文件解决冲突. 并且重新add, 再次进行commit.
+
+	注意:对于合并后的分支. dev 分支的所有commit 都可以在 master分支的 git log 中看到.
+		同时,如果你此时删除 dev分支,也只是删除dev这个指针, dev之前的commit仍然可以从master分支上的git log中查看.
+		只是此时你没有dev这个指针,无法通过git checkout dev 跳到你想跳到的commit节点.
+
+
+13. 分支管理策略
+
+	 git merge --no-ff -m "merge with no-ff" dev
+
+	通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
+	如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+
+
+14. Bug分支.
+	软件开发中，bug就像家常便饭一样。有了bug就需要修复，在Git中，由于分支是如此的强大，所以，每个bug都可以通过一个新的临时		分支来修复，修复后，合并分支，然后将临时分支删除。
+	当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支issue-101来修复它，但是，等等，当前正在dev上进行的	工作还没有提交：
+	此时如果我们切换到其他分支,可以发现其他分支中的工作区和我们当前的工作区一样,充斥着各种修改的文件,新增的文件.
+	因此,我们有一个迫切的需求,就是保持其他的工作区的状态为最近的一次commit的状态.
+
+	幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+	把工作区的变化贮存起来:(没有被git track的文件除外)
+	git stash 
+	git stash list    查看所有的stash的列表
+	git stash apply   将stash恢复到工作区,同时stash不删除
+	git stash pop	  将stash恢复到工作区,同时stash删除
+	git stash drop	  删除stash
+	git stash apply stash@{0}	恢复指定的stash内容. 如果不指定默认是恢复 stash@{0},最近的就是stash@{0}
+	git stash drop stash@{0}	删除指定的stash内容. 
+	git stash clear  	清除所有的stash.
+	git stash show		查看堆栈中最新保存的stash和当前目录的差异
+	git stash show -p 	查看详细的不同
+	----------------------
+	git stash save '此次stash的注释'   这种给stash打上注释的方法更推荐用于取代 git stash
+
+	git stash apply --index 
+	git stash pop --index
+	有两个文件修改了,a的状态是 changes not staged for commit; b的修改被add了,状态是changes to be comitted.
+	等我们stash后.再次恢复到工作区中(不加--index),可以发现 a 和 b 修改的内容仍然被恢复了. 但是 a 和 b 的
+	状态都是 changes not staged for commit.
+	因为文件内容都准确恢复了.只是状态没有被恢复,这个并不是很大的问题.重新使用git add就可以了.
+	如果你非要保持文件的状态也一致的话 ,可以加上 --index 这个参数.
+	我推荐加上这个参数
+	---------------------------------------
+	stash后的工作区,如果你继续修改;然后再恢复stash, 这样的操作是无法完成的.
+	除非你将stash之后的修改删除(版本回退);或者你将stash之后的修改继续stash为0,选择恢复stash的版本1.
+	或者你自己解决冲突.
+	-----------------------------------------------
+	默认情况下, git stash 会缓存 staged changes ,unstaged changes, 不会缓存 untracked files, ignored files.
+	如果想要缓存 没有被追踪的文件,可以 1)将unstracked files ,git add 或者 2)使用 git stash -u 参数
+	git stash -a 可以stash当前目录下的所有修改.
+	---------------------------------
+	可以尝试不同算法,stash为 func1 ,func2, func3.
+
+
+
+
+15. feature分支.
+	对于合并后的分支可以使用 
+	git branch -d 被合并的分支
+	但是没有被合并的分支是无法使用 git branch -d 要被删除的分支
+
+	这时就要使用强制删除 
+	git branch -d 没有被合并但是要强制被删除的分支
+
+
+16. 多人合作
+	第一: 如果是从远程仓库克隆而来, 那么本地仓库自动建立一个名为origin的远程地址的别名
+		否则就要使用 git remote add origin git@github.com:michaelliao/learngit.git 来创建别名.
+
+	第二: 推送分支.将本地分支上的所有提交推送到远程仓库中. 不是所有的本地分支都需要推送到远程.
+	git push origin master
+	git push origin dev
+
+	第三: 抓取分支. 从远程抓取分支到本地.
+	模拟另外一个小伙伴.
+	git clone git@github.com:michaelliao/learngit.git mlearngit
+	将michaelliao/learngit.git 克隆到mlearngit 目录中.
+	
+	当你从远程克隆时,默认只clone了master到本地仓库.
+	
+	如果你要在dev分支上开发,你必须把远程的dev分支克隆到本地.
+	git checkout -b dev origin/dev
+	这个命令同git checkout -b dev的区别是(git chekout -b dev 是以本地master的内容为基础开新的分支)
+
+	当切换为另外一个小伙伴进行git push 时出错,此时应该:
+	git pull origin dev
+	
+	如果出现冲突,就解决冲突,然后再次commit. 然后push.
+
+
+17. git rebase
+
+
+18. 创建标签.
+	
+	创建标签: 默认标签是打在最新提交的commit上
+	git tag v1.0
+	
+	查看所有标签:
+	git tag
+
+	给指定的某个commit打上标签.
+	git tag v0.9 f52c633
+
+	查看具体的标签tag信息:
+	 git show v0.9
+	
+	还可以创建带有说明的标签:附注标签:推荐使用
+	git tag -a v0.1 -m "version 0.1 released" 1094adb
+
+19. 操作标签.
+	删除标签:因为创建的标签都只存储在本地，不会自动推送到远程。所以，打错的标签可以在本地安全删除。
+	git tag -d v0.1
+
+	推送某个标签到远程
+	git push origin v1.0
+
+	一次性推送全部尚未推送到远程的本地标签
+	git push origin --tags
+
+	删除远程标签:
+	git tag -d v0.9
+	git push origin :refs/tags/v0.9
+
+20. 使用码云
+	一个本地库能不能既关联GitHub，又关联码云呢？
+	
+	先关联GitHub的远程库: 注意，远程库的名称叫github，不叫origin了。
+	git remote add github git@github.com:michaelliao/learngit.git
+	
+	接着，再关联码云的远程库：
+	git remote add gitee git@gitee.com:liaoxuefeng/learngit.git
+
+21. 自定义使用Git
+	
+	第一: 忽略特殊文件
+	1. 新建一个 .gitignore 文件
+	2. 将 .gitignore提交到GitHub
+	3. 强制添加一些被忽略规则忽略的文件
+	git add -f App.class
+	4. 对于无法添加的文件,测试是哪一个忽略规则起的作用.
+	git check-ignore -v App.class
+
+	
+	第二: 配置别名
+	如果敲git st就表示git status那就简单多了，
+	git config --global alias.st status
+	
+	配置图形简短显示log:
+	 git config --global alias.logs 'log --oneline --graph'
+	之后就可以直接使用 git logs
+
+	配置一个git last，让其显示最后一次提交信息：
+	git config --global alias.last 'log -1'
+	或者可以使用之前的配置: git logs -1
+
+	第三:配置文件
+	每个仓库的Git配置文件都放在.git/config文件中：
+	而当前用户的Git配置文件放在用户主目录下的一个隐藏文件.gitconfig中
+
+
+22. 搭建Git服务器
+
+		
+
+
+
+
+
+	
+
+	
+ 

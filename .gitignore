@@ -1,0 +1,2 @@
+# 忽略自己,意义不大, 加上! 表示不忽略 .gitignore
+!.gitignore

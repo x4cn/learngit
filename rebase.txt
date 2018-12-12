@@ -1,3 +1,4 @@
 rebase: init here
 add comment
 rabase: author
+set exit = 1

@@ -3,3 +3,4 @@ jut to test if 'git push' equal to 'git push origin master' after i use 'git pus
 test git push with out git clone but use git remote add.
 merge no ff 01
 02
+03

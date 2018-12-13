@@ -88,7 +88,7 @@ co
 
 	----------------
 
-	第一:查看commit的历史记录,已经当前在那个commit版本上.
+	第一:查看commit的历史记录,以及当前在那个commit版本上.
 	可能commit了很多次,可以通过git log 命令查看commit的历史记录: 从最近到最远的commit日志.
 	git log
 
@@ -99,7 +99,7 @@ co
 	git log --oneline
 	这个显示的commit的文件名的hash编码只显示7位.
 
-	git log 记录很多可以通过上下按钮切换,也可以输入数字翻页; 输入q,退出git log 命令.
+	git log 记录很多,可以通过上下按钮切换,也可以输入数字翻页; 输入q,退出git log 命令.
 
 	------------------------
 	Git中用 HEAD 表示当前版本 , 前一个版本 HEAD^ , 前两个版本 HEAD^^ , 前一百个版本 HEAD~100
@@ -112,7 +112,7 @@ co
 	-----------------------
 	如何回到最近的那条?要知道commit的版本号,但是在git log 中只显示两条,找不到最近的那个commit的版本号.
 	
-	下面的命令可以看到所有的commit历史和一些操作的历史.可以通过这个知道commit的版本的hash值.
+	下面的命令可以看到所有的commit历史和一些操作的历史.可以通过这个知道commit的版本号.
 	git reflog
 
 	然后执行
@@ -121,7 +121,7 @@ co
 	git reset --hard 2e457de
 
 	----------
-        注意如果使用 git reset --hard HEAD~100  ,但是当前只用3个版本(最多只能HEAD~2),这个就好报错.
+        注意如果使用 git reset --hard HEAD~100  ,但是当前只有3个commit版本(最多只能使用HEAD~2),这个就会报错.
         同时注意使用 git rellog 查看可以发现 这个错误的reset操作并不在 git rellog 的记录中.
 
 
@@ -160,7 +160,7 @@ co
         文件第一次修改,工作区版本变为2; add添加到暂存区, 暂存区版本为2; commit区版本仍然是1.
 	文件第二修改,工作区版本为3; 暂存区版本为2; commit区版本为1.
 	如何让工作区的版本变为1.
-	如何我们使用git checkout -- read.txt. 会检索暂存区和commit区,发现最新的提交的版本是2,此时工作区的版本只会回复到版本2.
+	如果我们使用git checkout -- read.txt. 会检索暂存区和commit区,发现最新的版本是2,此时工作区的版本只会回复到版本2.
 	
 	所以,我们应该先降低暂存区的版本.
 	使用git reset HEAD read.txt . 撤销暂存区的修改,将暂存区的版本恢复到最新的commit, 就是版本1.
@@ -187,6 +187,10 @@ co
 	2.登陆github
 	setting ----> SSH and GPG keys ---> new SSH key ----->添加title 和 key 即可
 
+	3.测试是否联通github账号.
+	ssh -T git@github.com
+
+
 
 9. 添加到远程库(将本地已经存在的库添加到远程的空白库)
 	第一:登陆远程库,创建一个仓库learngit
@@ -198,14 +202,14 @@ co
 
 	-------------------------
 	可以另外添加其他的远程库起名字为origin2,origin3,或者其他的名字,你可以自己设定.
-	git remote -v        这个命令可以查看所有的设置的remote.
-	git reomte rm origin  这个命令可以删除 被命名为 origin的 remote.
-	git remote set-url origin git@github.com:nazar-art/NewYearGift.git  这个命令可以为origin这个命名设置其他的远程仓库地址.
+	git remote -v        这个命令可以查看本地仓库关联的所有的远程仓库的地址
+	git reomte rm origin  这个命令可以删除 被命名为 origin的 remote远程仓库(删除的是一种关联关系).
+	git remote set-url origin git@github.com:nazar-art/NewYearGift.git  这个命令可以为origin这个别名设置其他的远程仓库地址.
 	git remote show origin		查看缩写为origin的这个远程仓库的详细信息.
 	git remote rename origin neworigin	将缩写为origin的这个远程地址的缩写改为neworigin.
 	------------------
-	注意:每个仓库都可以有名为origin的缩写的远程仓库.比如learngit这个本地库有两个远程缩写地址:origin,test;
-		gittest这个本地库有三个远程缩写地址:origin,origin2,remotetest. 这两个不同本地库中中origin对应
+	注意:每个本地仓库都可以有名为origin的缩写的远程仓库.比如learngit这个本地库有两个远程缩写地址:origin,test;
+		gittest这个本地库有三个远程缩写地址:origin,origin2,remotetest. 这两个不同本地仓库中的origin对应
 		的地址可以相同也可以不相同.
 	------------------------
 
@@ -213,6 +217,15 @@ co
 	第三: 将本地仓库的内容推动到远程仓库
 	git push -u origin master
 	使用 -u 这个参数,以后就可以直接使用 git push (这个命令就代表这个 git push origin maste 的简化.)
+	
+	此时如果有dev分支,你使用git push ;会报错,提示没有追踪信息fatal: The current branch dev has no upstream branch.
+	所以你可以: 第一种: 直接使用  git push origin dev
+	第二种: 使用 git push --set-upstream origin dev 创建一个关联,提示:Branch 'dev' set up to track remote branch 'dev' from 'origin'.
+	此时你在dev下使用: git push 就可以了. 它等同于 git push origin dev;
+	第三种: 在dev分支下使用命令: git push -u origin dev   下一次的时候就可以使用git push 了.
+ 
+
+
 
 
 
@@ -225,43 +238,78 @@ co
 	ls
 
 	---------------
-	注意:当你使用 git clone 后, 本地仓库自动创建了一个远程仓库的缩写origin.
+	注意:当你使用 git clone 后, 本地仓库自动创建了一个远程仓库的别名origin,并且将两者关联了起来
 	     所以你可以直接使用git push  这个命令等同于 git push origin master 
 
 	-------------------
 	也可以使用 https 的方式克隆:
-	https://github.com/michaelliao/gitskills.git
-	这种方式的克隆首先 肯定会自动创建origin的缩写,所以可以使用git push 提交到远程仓库;
+	git clone https://github.com/michaelliao/gitskills.git
+	这种方式的克隆首先 肯定会自动创建origin的别名并且关联远程,所以可以使用git push 提交到远程仓库;
 	但是,每次git push 的时候要求你输入那个远程仓库的用户名和密码;
 	有两种方法解决:
-	第一种:重新设置 origin的地址改为SSH的方式.
+	第一种:重新设置 origin代表的地址改为SSH的方式.
 	第二种:使用git config --list 查看 credential.helper=manager , 如果是manager的话,你只需要输入一次就可以了.		
 	
 	-------------------------------------
 	产生SSH key 的邮箱账号, git config 中的邮箱账号, github的邮箱账号 三者之间的关系?
 	三者没有任何关系, 比如 产生SSH key 的 邮箱是 aa@qq.com ;
 	git cnfig 中 global的账号是 bb@qq.com ,假设用户名是bb; github的邮箱账号是 cc@qq.com;
-	你将aa@qq.com 产生的 SSH key 放在 cc@qq.com 登陆的 github 账号中,
-	你提交代码到github 中,此时显示的提交者是 bb; 如何你给仓库修改本仓库的账号dd@qq.com ,用户名dd ;
+	你将使用aa@qq.com作为账号产生的 SSH key 放在 cc@qq.com 登陆的 github 账号的SSH设置中,
+	你提交代码到github 中,此时显示的提交者是 bb; 如果你进入仓库修改本地仓库的账号dd@qq.com ,用户名dd ;
+	这个修改在你使用这个本地仓库时会覆盖住global的设置; 
 	此时继续提交到cc@qq.com的GitHub中, 显示的提交者就是dd.
 
 	------------------------------
 
 
 
-11. 创建与合并分支
+11. 创建与合并分支,本地分支关联远程分支
 
 	查看分支：git branch
+	
+	查看所有分支: git branch -a
 
 	创建分支：git branch <name>
 
 	切换分支：git checkout <name>
 
 	创建+切换分支：git checkout -b <name>
+	
+	从本地dev分支创建一个f-02分支:  git branch feature-02 dev
+	
+	从本地dev分支创建一个f-01分支,并且切换到f-01分支:   git checkout -b feature-01 master
+	
+	创建+切换分支;但是从origin/dev创建本地的dev分支: git checkout -b dev origin/dev
 
 	合并某分支到当前分支：git merge <name>
+	合并分支推荐用法:可以形成一个 D形状的历史,而不是一段直线:  git merge --no-ff -m "merge with no-ff" dev     
+	
+	删除本地分支：git branch -d <name>
+	删除远程分支: git push origin --delete dev
 
-	删除分支：git branch -d <name>
+
+
+	-----------------------------------
+	关联分支:
+	查看本地分支与远程分支的映射关系:  git branch -vv
+	建立当前分支与远程分支的映射关系:  git branch -u origin/addFile 或者 git branch --set-upstream-to origin/addFile
+	撤销本地分支与远程分支的映射关系:  git branch --unset-upstream
+
+	
+	
+
+	----------------------------------------
+	一个常见的流程:
+	git checkout develop #切换到develop分支
+
+	git merge --no-ff feature_branch #合并分支
+
+	git branch -d feature_branch #删除需求分支
+
+	git push origin develop #推送
+
+作者
+
 
 	--------------------------------------
 
@@ -350,6 +398,21 @@ co
 	git stash -a 可以stash当前目录下的所有修改.
 	---------------------------------
 	可以尝试不同算法,stash为 func1 ,func2, func3.
+
+	
+	----------------------------------------------
+	如果我们从一个起点创建master分支, 从master分支创建dev分支,并且使用master合并dev后,我们并不是
+	[删除dev分支,然后重新从master分支中创建dev分支],
+	这样当我们从master分支创建bug分支,master分支合并bug分支,master分支删除bug分支;
+	这样就会出现一个问题: 那就是dev分支实际上缺少了一些东西,会出现bug(虽然这个bug在master的时候不会出现).
+	
+	正确做法: 1)从master分支创建bug分支; 2)master分支合并bug分支 ; 3)dev分支合并bug分支; 4)最后删除bug分支
+
+	-----------------------------------------------------------------------
+	如果我们每次master分支合并dev分支,之后我们1)删除dev分支 2)重新从最新提交的master分支创建dev分支
+	这样当我们从master分支创建bug分支,master合并bug,删除bug;
+	此时dev分支仍然会有bug,但是当我们进行下一次master合并dev;删除dev; 从最新的master创建dev;此时新创建的
+	dev是没有bug的.
 
 
 

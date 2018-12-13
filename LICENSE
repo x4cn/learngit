@@ -2,3 +2,4 @@ this is a license.
 jut to test if 'git push' equal to 'git push origin master' after i use 'git push -u origin master' 
 test git push with out git clone but use git remote add.
 merge no ff 01
+02
